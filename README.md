@@ -5,9 +5,9 @@ The logs are stored as json in `.txt` file
   
 	
 ```
-food_id := make(map[string][]string)
+food_id := make(map[string](map[string]bool))
 ```
-Stores key as foodmenu_id and eater_id as value 
+Stores key as foodmenu_id and key value pair of eater_id and boolean 
 
 	
 ```
@@ -15,6 +15,13 @@ freq := make(map[string]int)
 ```
 counts the frequency of food_id ordered
 
+To make sure there is no repeated value we check if the key-value pair exists or not
+
+```
+if food_id[log.FoodmenuID][log.EaterID] == true {
+				return []string{}, errors.New("similar entries found")
+			}
+```
 
 
 ## Question 2
