@@ -17,18 +17,18 @@ type Logs struct {
 }
 
 func main() {
+
 	//read the log
-	ans, err := restaurant("log.txt")
+	ans, err := getFood_ids("log.txt")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(ans)
-
+	fmt.Println("The top three item ordered are  \n", "1st foodmenu_id:", ans[0], "  2nd foodmenu_id:", ans[1], "  3rd foodmenu_id:", ans[2])
 }
 
-func restaurant(adr string) ([]string, error) {
-	//open the log file
+func getFood_ids(adr string) ([]string, error) {
+	//Open the log file
 	jsonFile, err := os.Open(adr)
 	if err != nil {
 		fmt.Println(err)
@@ -40,10 +40,12 @@ func restaurant(adr string) ([]string, error) {
 	logs := Logs{}
 	json.Unmarshal([]byte(byteValue), &logs)
 
+	//stores key as foodmenu_id and eater_id as value
 	food_id := make(map[string][]string)
-	freq := make(map[string]int)
+	//counts the frequency of food_id ordered
+	food_freq := make(map[string]int)
 
-	//goes through logs
+	//Goes through logs to make sure there are no repeated entry
 	for _, log := range logs.Log {
 		if food_id[log.FoodmenuID] != nil {
 			//if similar entry found returns err
@@ -53,20 +55,21 @@ func restaurant(adr string) ([]string, error) {
 				}
 			}
 			food_id[log.FoodmenuID] = append(food_id[log.FoodmenuID], log.EaterID)
-			freq[log.FoodmenuID] = freq[log.FoodmenuID] + 1
+			food_freq[log.FoodmenuID] = food_freq[log.FoodmenuID] + 1
 		} else if food_id[log.FoodmenuID] == nil {
 			food_id[log.FoodmenuID] = append(food_id[log.FoodmenuID], log.EaterID)
-			freq[log.FoodmenuID] = 1
+			food_freq[log.FoodmenuID] = 1
 		}
 	}
 
-	keys := make([]string, 0, len(freq))
-	for key := range freq {
+	//sorting the food_frequency to get top three
+	keys := make([]string, 0, len(food_freq))
+	for key := range food_freq {
 		keys = append(keys, key)
 	}
 
 	sort.Slice(keys, func(i, j int) bool {
-		return freq[keys[i]] > freq[keys[j]]
+		return food_freq[keys[i]] > food_freq[keys[j]]
 	})
 
 	ans := []string{keys[0], keys[1], keys[2]}
