@@ -54,9 +54,12 @@ This code adds tasks to the cnp channel
     fmt.Println("HERE1")
   }
 ```
+Since we created a buffered channel, it will ensure that only ten tasks are run in a batch after the buffer is filled.
+
+In this case "Here1" wont be printed as there is just one task added.
 
 ### Use case
 When we spawn too many goroutine, our machine will quickly run out of memory and the CPU will keep processing the task until it reach the limit. By using limited pool of workers and keep the task on the queue, we can reduce the burst of CPU and memory since the task will wait on the queue until the the worker pull the task.
 
 This approach is useful to process large tasks into batches. Collecting individual work items and distribute them amongst workers for concurrent processing.
-In this case we have 4 worker which are responsible for 10 tasks per batch  
+In this case we have 4 worker which are responsible for 10 tasks per batch.

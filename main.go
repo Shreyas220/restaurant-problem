@@ -40,24 +40,24 @@ func getFood_ids(adr string) ([]string, error) {
 	logs := Logs{}
 	json.Unmarshal([]byte(byteValue), &logs)
 
-	//stores key as foodmenu_id and eater_id as value
-	food_id := make(map[string][]string)
+	//stores key as foodmenu_id and key-value pair for corresponding eater_id
+	food_id := make(map[string](map[string]bool))
 	//counts the frequency of food_id ordered
 	food_freq := make(map[string]int)
 
 	//Goes through logs to make sure there are no repeated entry
 	for _, log := range logs.Log {
 		if food_id[log.FoodmenuID] != nil {
-			//if similar entry found returns err
-			for _, eaterid := range food_id[log.FoodmenuID] {
-				if eaterid == log.EaterID {
-					return []string{}, errors.New("similar entries found")
-				}
+			//checking if the entry exits
+			if food_id[log.FoodmenuID][log.EaterID] == true {
+				return []string{}, errors.New("similar entries found")
 			}
-			food_id[log.FoodmenuID] = append(food_id[log.FoodmenuID], log.EaterID)
+			food_id[log.FoodmenuID][log.EaterID] = true
 			food_freq[log.FoodmenuID] = food_freq[log.FoodmenuID] + 1
 		} else if food_id[log.FoodmenuID] == nil {
-			food_id[log.FoodmenuID] = append(food_id[log.FoodmenuID], log.EaterID)
+			food_id[log.FoodmenuID] = map[string]bool{
+				log.EaterID: true,
+			}
 			food_freq[log.FoodmenuID] = 1
 		}
 	}
